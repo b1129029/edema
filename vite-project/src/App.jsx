@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
+import "react-datepicker/dist/react-datepicker.css";
 import Header from './components/Header'
 import InfoPage from './pages/InfoPage'
 import SettingPage from './pages/SettingPage'
