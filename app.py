@@ -11,6 +11,21 @@ PHOTO_DIR = os.path.join(app.root_path, 'photo')  # 沒有前導斜線！
 
 with open('patients.json', 'r', encoding='utf-8') as f:
     patients_data = json.load(f)
+    
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    sql = "SELECT * FROM account WHERE username = %s AND password = %s LIMIT 1"
+    result = db.select(sql, (username, password))
+
+    if result:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False}), 401
+
 
 @app.route('/api/patients')
 def get_patients():
@@ -142,6 +157,16 @@ def update_foot_data(entry_id):
     except Exception as e:
         print(f"Error updating foot data: {e}")
         return jsonify({'error': 'Failed to update foot data'}), 500
+
+@app.route('/api/update_account', methods=['POST'])
+def update_user():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    print(username, password)
+    sql = "UPDATE account SET username=%s, password=%s WHERE id = 1 "
+    db.update(sql, (username, password))
+    return jsonify({'success': True})
 
 
 if __name__ == '__main__':
