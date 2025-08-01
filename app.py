@@ -6,6 +6,8 @@ import os
 app = Flask(__name__)
 CORS(app)  # 🔁 允許前端跨域請求
 
+VITE_DIST_DIR = os.path.join(os.path.dirname(__file__), 'vite-project', 'dist')
+
 db = Database(host='127.0.0.1', port=3306, user='root', passwd='', database='edema')
 PHOTO_DIR = os.path.join(app.root_path, 'photo')  # 沒有前導斜線！
 
@@ -168,6 +170,20 @@ def update_user():
     db.update(sql, (username, password))
     return jsonify({'success': True})
 
+@app.route('/assets/<path:filename>')
+def vite_assets(filename):
+    assets_dir = os.path.join(VITE_DIST_DIR, 'assets')
+    return send_from_directory(assets_dir, filename)
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def vite_index(path):
+    if path.startswith('api/'):
+        return jsonify({'error': 'API Not Found'}), 404
+    index_file = os.path.join(VITE_DIST_DIR, 'index.html')
+    return send_from_directory(VITE_DIST_DIR, 'index.html')
+
+
+# ✅ 最後啟動
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000, debug=True)
